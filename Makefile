@@ -1,10 +1,13 @@
 include Metadata
 
+CFLAGS := $(if $(RPM_OPT_FLAGS), $(RPM_OPT_FLAGS), $(CFLAGS))
+
 LDFLAGS = $(shell pkg-config --libs gtk+-2.0)
 CFLAGS += -Wall
-CFLAGS += $(RPM_OPT_FLAGS)
 CFLAGS += $(shell pkg-config --cflags gtk+-2.0) -DGTK_DISABLE_BROKEN -DGTK_DISABLE_DEPRECATED
 CFLAGS += -DPROJNAME='"$(PROJNAME)"' -DVERSION='"$(VERSION)"'
+CPPFLAGS =
+CXXFLAGS =
 
 SRC = util stock theme_sel font_sel preview_pane about_dialog mainwin main
 
@@ -36,21 +39,25 @@ distclean: clean depend
 
 install: all
 	strip      $(EXENAME)
-	install -d              $(DESTDIR)/$(PREFIX)/bin
-	install -c $(EXENAME)   $(DESTDIR)/$(PREFIX)/bin
-	install -d              $(DESTDIR)/$(PREFIX)/man/man1
-	install -c $(EXENAME).1 $(DESTDIR)/$(PREFIX)/man/man1
+	install -d              $(DESTDIR)/$(BINDIR)
+	install -c $(EXENAME)   $(DESTDIR)/$(BINDIR)
+	install -d              $(DESTDIR)/$(MANDIR)/man1
+	install -c $(EXENAME).1 $(DESTDIR)/$(MANDIR)/man1
 
 DISTFILES = $(addsuffix .c, $(SRC)) $(addsuffix .h, $(SRC)) $(EXTRAS)
 DISTNAME = $(EXENAME)-$(VERSION)
+
 dist: $(DISTFILES)
 	rm -rf /tmp/$(DISTNAME)
 	mkdir /tmp/$(DISTNAME)
 	cp -a $(DISTFILES) /tmp/$(DISTNAME)/
-	tar cvjf ../$(DISTNAME).tar.bz2 -C /tmp $(DISTNAME)/
+	tar cvjf $(DISTNAME).tar.bz2 -C /tmp $(DISTNAME)/
 	rm -rf /tmp/$(DISTNAME)
 
-.PHONY: clean all install dist depend
+rpm: dist $(EXENAME).spec
+	rpmbuild -ta $(DISTNAME).tar.bz2
+
+.PHONY: clean all install dist rpm depend
 
 # DO NOT DELETE
 

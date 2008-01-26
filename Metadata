@@ -1,11 +1,16 @@
 PROJNAME = Gtk+ 2.0 Change Theme
 AUTHOR = Aristotle Pagaltzis
 EXENAME = gtk-chtheme
-VERSION = 0.3
-SUMMARY = Gtk+ 2.0 theme preview and selection made slick.
+VERSION = 0.3.1
 HOMEPAGE = http://plasmasturm.org/programs/gtk-chtheme/
+
+SUMMARY = Gtk+ 2.0 theme preview and selection made slick.
 DESCRIPTION = \
 As the name suggests, this little program lets you change your Gtk+ 2.0 theme.\
 The aim is to make theme preview and selection as slick as possible. Themes\
 installed on the system are presented for selection and previewed on the fly.\
 A large variety of widgets provides a comprehensive demonstration.
+
+PREFIX = /usr
+BINDIR = $(PREFIX)/bin
+MANDIR = $(PREFIX)/share/man

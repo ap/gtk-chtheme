@@ -1,4 +1,4 @@
-%if %( test -f /etc/SuSE-release ; echo $? )
+%if %( test ! -f /etc/SuSE-release ; echo $? )
 %define _prefix %( awk '/VERSION/ { print ( $3 < "9.0" ) ? "/opt/gnome2" : "/opt/gnome" }' /etc/SuSE-release )
 %define _group System/GUI/GNOME
 %else
@@ -29,12 +29,13 @@ AutoReq: 0
 make
 
 %install
-make install PREFIX="%{_prefix}" DESTDIR="%{buildroot}"
+make install PREFIX="%{_prefix}" DESTDIR="%{buildroot}" MANDIR="%{_mandir}"
 
 %clean
 rm -rf %{buildroot}
 
 %files
 %defattr(-, root, root)
-%doc COPYING ChangeLog ${_mandir}/man1/%{name}.1
+%doc COPYING ChangeLog
 %{_bindir}/%{name}
+%{_mandir}/man1/%{name}.*
