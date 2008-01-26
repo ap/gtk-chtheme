@@ -1,0 +1,8 @@
+Makefile.depend
+gtk-chtheme
+gtk-chtheme.1
+gtk-chtheme.pod
+gtk-chtheme.spec
+*.o
+*.png_c
+TODO
