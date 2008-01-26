@@ -1,24 +1,30 @@
-GCC = cc
 PREFIX=/usr
-CFLAGS = -O2 -Wall $(shell pkg-config --cflags gtk+-2.0)
 LIBS = $(shell pkg-config --libs gtk+-2.0)
-CFLAGS += -DGTK_DISABLE_BROKEN -DGTK_DISABLE_DEPRECATED -DVERSION=\"$(VERSION)\"
+CFLAGS += -Wall
+CFLAGS += $(shell pkg-config --cflags gtk+-2.0) -DGTK_DISABLE_BROKEN -DGTK_DISABLE_DEPRECATED
 
-PROGNAME = gtk-chtheme
-VERSION = 0.1
-all: $(PROGNAME)
+PROJNAME = "Gtk+ 2.0 Change Theme"
+EXENAME = gtk-chtheme
+VERSION = 0.2
 
-$(PROGNAME): $(PROGNAME).c
-	${GCC} -o $(PROGNAME) $(PROGNAME).c ${CFLAGS} ${LIBS}
+CFLAGS += -DPROJNAME=\"$(PROJNAME)\" -DVERSION=\"$(VERSION)\"
+
+AUXILIARY = stock themeutil theme demo about
+
+all: $(EXENAME)
+
+$(EXENAME): main.c $(addsuffix .c, $(AUXILIARY)) $(addsuffix .h, $(AUXILIARY))
+	$(CC) -o $(EXENAME) $(filter %.c, $^) $(CFLAGS) $(LIBS)
 
 clean:
-	-rm -f $(PROGNAME) *~
+	-rm -f $(EXENAME)
 	
 install: all
-	strip $(PROGNAME)
+	strip $(EXENAME)
 	mkdir -p ${PREFIX}/bin
-	install -c $(PROGNAME) ${PREFIX}/bin
+	install -c $(EXENAME) ${PREFIX}/bin
 
 dist: clean
-	rm -rf /tmp/$(PROGNAME)-$(VERSION)
-	tar cjf ../$(PROGNAME)-$(VERSION).tar.bz2 .
+	rm -rf /tmp/$(EXENAME)-$(VERSION)
+	cp -a . /tmp/$(EXENAME)-$(VERSION)
+	tar cvjf ../$(EXENAME)-$(VERSION).tar.bz2 -C /tmp $(EXENAME)-$(VERSION)
