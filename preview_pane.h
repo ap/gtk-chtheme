@@ -14,13 +14,9 @@ along with this program; if not, write to the Free Software
 Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#ifndef ___THEMEUTIL_H
-#define ___THEMEUTIL_H 1
+#ifndef ___PREVIEW_PANE_H
+#define ___PREVIEW_PANE_H 1
 
-gchar* homedir(void);
-void cleanup_temporary(void);
-void init_theme_list(gchar *dirname);
-void populate_themelist (gpointer func, gpointer user_data);
-gchar* write_rc_file(gchar *theme_dir, gchar* newfont, gboolean is_preview);
+GtkWidget* create_preview_pane(void);
 
 #endif

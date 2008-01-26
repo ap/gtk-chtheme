@@ -1,0 +1,32 @@
+# Version 0.3
+
+* Added writing "gtk-font-name" setting.
+* Added [Apply] button.
+* Added RPM .spec file.
+* Added this ChangeLog.
+* Another major code reorganization, some cleanup ensued.
+* Removed clearing of font upon theme selection change.
+* Removed notebook, moved preview panel onto main view, removed textarea from preview panel.
+* Renamed all references to "demo" to "preview".
+* Added blocking of main window when font dialog is shown.
+* Added disabling of font clear button; fixes segfault when clicked before any theme selected.
+* Added parsing of existing gtkrc to preset widgets
+* Made all widgets in preview pane unfocussable with keyboard.
+* Thanks to help from Andre Costa and Pascal Bleser, RPM packages are now available.
+
+# Version 0.2
+
+* Massive code cleanup and reorganization.
+* Lots of minor improvements for the demo tab.
+
+# Version 0.1
+
+* Based on Gtk Theme Switch.
+* Tarball installation features removed.
+* Theme directories that do not contain a Gtk+ theme are not offered for selection.
+* Theme names are presented in a scrollable list rather than a combobox.
+* The dialog window updates itself as a preview rather than opening a separate window.
+* Integrate the preview into the main window, putting the selection and preview controls in tabs.
+* Preview button removed, preview happens immediately when a selection is made.
+* Buttons renamed to Ok & Cancel.
+* Use stock icons as much as possible.

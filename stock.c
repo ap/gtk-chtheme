@@ -16,8 +16,10 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <gtk/gtk.h>
 #include "stock.h"
+#include "stock_menu_about.xpm"
 
-#define NUM_NEW_STOCK_ITEMS 6
+#define NUM_NEW_STOCK_ITEMS 7
+#define NUM_REMAPPED_STOCK_ITEMS 6
 
 GtkStockItem stock_items[NUM_NEW_STOCK_ITEMS] = {
 	{ GTK_STOCK_BUTTON,   "Button",     0, 0, "gtk20" },
@@ -26,6 +28,7 @@ GtkStockItem stock_items[NUM_NEW_STOCK_ITEMS] = {
 	{ GTK_STOCK_TOGGLE3,  "Toggle",     0, 0, "gtk20" },
 	{ GTK_STOCK_DISABLED, "Disabled",   0, 0, "gtk20" },
 	{ GTK_STOCK_IMAGE,    "With image", 0, 0, "gtk20" },
+	{ GTK_STOCK_ABOUT,    "About",      0, 0, "gtk20" },
 };
 
 struct { gchar *old_id, *new_id; } stock_map[NUM_NEW_STOCK_ITEMS] = {
@@ -37,14 +40,22 @@ struct { gchar *old_id, *new_id; } stock_map[NUM_NEW_STOCK_ITEMS] = {
 	{ GTK_STOCK_IMAGE,    GTK_STOCK_CONVERT   },
 };
 
-void init_new_stock_items(void) {
-	GtkIconFactory* demo_icon_factory = gtk_icon_factory_new();
+void init_new_stock_items(void)
+{
+	GtkIconFactory *icon_factory = gtk_icon_factory_new();
 
 	int i;
-	for(i = 0; i < NUM_NEW_STOCK_ITEMS; ++i) {
-		gtk_icon_factory_add(demo_icon_factory, stock_map[i].old_id, gtk_icon_factory_lookup_default(stock_map[i].new_id));
+
+	for (i = 0; i < NUM_REMAPPED_STOCK_ITEMS; ++i)
+	{
+		gtk_icon_factory_add(icon_factory, stock_map[i].old_id,
+			gtk_icon_factory_lookup_default(stock_map[i].new_id));
 	}
 
+	gtk_icon_factory_add(icon_factory, GTK_STOCK_ABOUT,
+		gtk_icon_set_new_from_pixbuf(gdk_pixbuf_new_from_xpm_data
+			((const char**)stock_menu_about)));
+
 	gtk_stock_add_static(stock_items, NUM_NEW_STOCK_ITEMS);
-	gtk_icon_factory_add_default(demo_icon_factory);
+	gtk_icon_factory_add_default(icon_factory);
 }

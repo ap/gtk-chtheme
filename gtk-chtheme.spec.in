@@ -1,0 +1,40 @@
+%if %( test -f /etc/SuSE-release ; echo $? )
+%define _prefix %( awk '/VERSION/ { print ( $3 < "9.0" ) ? "/opt/gnome2" : "/opt/gnome" }' /etc/SuSE-release )
+%define _group System/GUI/GNOME
+%else
+%define _prefix /usr
+%define _group User Interface/Desktops
+%endif
+
+Name:     !!EXENAME
+Summary:  !!SUMMARY
+Packager: !!AUTHOR
+URL:      !!HOMEPAGE
+Group: %{_group}
+License: GPL
+
+Version: !!VERSION
+Release: 1
+Source0: %{name}-%{version}.tar.bz2
+BuildRoot: %{_tmppath}/%{name}-%{version}-build
+AutoReq: 0
+
+%description
+!!DESCRIPTION
+
+%prep
+%setup -q
+
+%build
+make
+
+%install
+make install PREFIX="%{_prefix}" DESTDIR="%{buildroot}"
+
+%clean
+rm -rf %{buildroot}
+
+%files
+%defattr(-, root, root)
+%doc COPYING ChangeLog ${_mandir}/man1/%{name}.1
+%{_bindir}/%{name}

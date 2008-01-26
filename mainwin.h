@@ -14,12 +14,9 @@ along with this program; if not, write to the Free Software
 Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#ifndef ___THEME_H
-#define ___THEME_H 1
+#ifndef ___MAINWIN_H
+#define ___MAINWIN_H 1
 
-void await_activation (gpointer data);
-gchar* get_newfont (void);
-gchar* get_selected_theme (void);
-GtkWidget* theme_page(void);
+GtkWidget* create_mainwin(void);
 
 #endif

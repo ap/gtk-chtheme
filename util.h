@@ -14,9 +14,11 @@ along with this program; if not, write to the Free Software
 Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#ifndef ___ABOUT_H
-#define ___ABOUT_H 1
+#ifndef ___UTIL_H
+#define ___UTIL_H 1
 
-GtkWidget* about_page(void);
+GtkWidget* unfocussable(GtkWidget *w);
+GtkWidget* gtk_toggle_button_new_from_stock(const gchar *stock_id);
+GtkLabel* gtk_label_new_from_pango_markup(const char *markup_text, GtkJustification jtype);
 
 #endif
