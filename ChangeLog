@@ -1,6 +1,7 @@
 # Version 0.4
 
 * Fix missing check if opening .gtkrc-2.0 succeeded before attempting to parse it.
+* Replace use of makedepend by cc -M, miscellaneous Makefile improvements
 
 # Version 0.3.1
 
