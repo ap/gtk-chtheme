@@ -16,11 +16,20 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <glib.h>
 #include <gtk/gtk.h>
-#include <unistd.h>				// unlink()
-#include <stdlib.h>				// getenv()
-#include <stdio.h>				// fopen() fdopen() fprintf()
+
 #include <string.h>
 #include <fcntl.h>
+/*
+ * fopen() fdopen() fprintf() -> stdio.h
+ * getuid() unlink() -> unistd.h
+ * struct passwd -> sys/types.h
+ * getpwuid() -> pwd.h
+ */
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+
 #include "main.h"
 #include "stock.h"
 #include "mainwin.h"
@@ -29,7 +38,15 @@ GHashTable *hash = NULL;
 GSList *awaiting_activation = NULL;
 gchar *tmp_rc = NULL, *gtkrc = NULL, *font = NULL, *themename = NULL;
 
-// dirname gets freed!
+char * homedir()
+{
+	static char* homedir = NULL;
+	if(!homedir)
+		homedir = strdup(getpwuid(getuid())->pw_dir);
+	return homedir;
+}
+
+/* dirname gets freed! */
 void read_theme_list(gchar * dirname)
 {
 	GDir *dir = g_dir_open(dirname, 0, NULL);
@@ -75,34 +92,47 @@ void cleanup_temporary(void)
 
 void apply_new_look(gboolean is_preview)
 {
+	FILE *gtkrc_fh;
+
 	if(!themename) return;
 
 	cleanup_temporary();
 
-	FILE *gtkrc_fh = is_preview
+	gtkrc_fh = is_preview
 		? fdopen(g_file_open_tmp("gtkrc.preview-XXXXXXXX", &tmp_rc, NULL), "w+")
 		: fopen(gtkrc, "w");
 
-	gchar *include_file = g_hash_table_lookup(hash, themename);
-
 	fprintf(gtkrc_fh,
-		"# -- THEME AUTO-WRITTEN DO NOT EDIT\n" "include \"%s\"\n\n",
-		include_file);
+		"# -- THEME AUTO-WRITTEN DO NOT EDIT\n"
+		"include \"%s\"\n\n",
+		(char*) g_hash_table_lookup(hash, themename));
 
 	if (font)
-	{
 		fprintf(gtkrc_fh,
-			"style \"user-font\" {\n" "\tfont_name = \"%s\"\n" "}\n\n", font);
-		fprintf(gtkrc_fh, "widget_class \"*\" style \"user-font\"\n\n");
-		fprintf(gtkrc_fh, "gtk-font-name=\"%s\"\n\n", font);
-	}
+			"style \"user-font\" {\n"
+			"\tfont_name = \"%s\"\n"
+			"}\n"
+			"\n"
+			"widget_class \"*\" style \"user-font\"\n"
+			"\n"
+			"gtk-font-name=\"%s\"\n"
+			"\n",
+			font,
+			font);
 
-	fprintf(gtkrc_fh, "include \"%s/.gtkrc.mine\"\n\n", getenv("HOME"));
-	fprintf(gtkrc_fh, "# -- THEME AUTO-WRITTEN DO NOT EDIT\n");
+	fprintf(gtkrc_fh,
+		"include \"%s/.gtkrc.mine\"\n"
+		"\n"
+		"# -- THEME AUTO-WRITTEN DO NOT EDIT\n",
+		homedir());
+
 	fclose(gtkrc_fh);
 
-	gchar *default_files[] = { is_preview ? tmp_rc : gtkrc, NULL };
-	gtk_rc_set_default_files(default_files);
+	{
+		gchar *default_files[] = { NULL, NULL };
+		default_files[0] = is_preview ? tmp_rc : gtkrc;
+		gtk_rc_set_default_files(default_files);
+	}
 
 	if (is_preview)
 	{
@@ -110,10 +140,13 @@ void apply_new_look(gboolean is_preview)
 	}
 	else
 	{
-		GdkEventClient event =
-			{ GDK_CLIENT_EVENT, NULL, TRUE, gdk_atom_intern("_GTK_READ_RCFILES",
-				FALSE), 8 };
-		gdk_event_send_clientmessage_toall((GdkEvent *) & event);
+		GdkEvent event;
+		event.client.type = GDK_CLIENT_EVENT;
+		event.client.send_event = TRUE;
+		event.client.window = NULL;
+		event.client.message_type = gdk_atom_intern("_GTK_READ_RCFILES", FALSE);
+		event.client.data_format = 8;
+		gdk_event_send_clientmessage_toall(&event);
 	}
 }
 
@@ -182,7 +215,7 @@ void parse_gtkrc(void)
 	GScanner *s = gtk_rc_scanner_new();
 	g_scanner_input_file(s, open(gtkrc, O_RDONLY));
 
-	g_strconcat(getenv("HOME"), "/.themes", NULL);
+	g_strconcat(homedir(), "/.themes", NULL);
 	g_strconcat(gtk_rc_get_theme_dir(), "%s/gtk-2.0/gtkrc", NULL);
 
 	while(!g_scanner_eof(s)) {
@@ -215,13 +248,13 @@ void parse_gtkrc(void)
 int main(int argc, char *argv[])
 {
 	hash = g_hash_table_new(g_str_hash, g_str_equal);
-	gtkrc = g_strdup_printf("%s/.gtkrc-2.0", getenv("HOME"));
+	gtkrc = g_strdup_printf("%s/.gtkrc-2.0", homedir());
 
 	gtk_init(&argc, &argv);
 
 	init_new_stock_items();
 
-	read_theme_list(g_strconcat(getenv("HOME"), "/.themes", NULL));
+	read_theme_list(g_strconcat(homedir(), "/.themes", NULL));
 	read_theme_list(gtk_rc_get_theme_dir());
 
 	parse_gtkrc();

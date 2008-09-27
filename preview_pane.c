@@ -23,17 +23,19 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 GtkWidget* create_preview_pane(void)
 {
+	GtkWidget* frame;
 	GtkBox* box = GTK_BOX(unfocussable(gtk_vbox_new(FALSE, 5)));
 
 	{
 		gint i;
+		GtkWidget *item;
 
 		GtkWidget *menubar = unfocussable(gtk_menu_bar_new());
 
 		GtkWidget *menu = unfocussable(gtk_menu_new());
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), unfocussable(gtk_tearoff_menu_item_new()));
 
-		GtkWidget *item = unfocussable(gtk_menu_item_new_with_label("Menu"));
+		item = unfocussable(gtk_menu_item_new_with_label("Menu"));
 		gtk_menu_shell_append(GTK_MENU_SHELL(menubar), item);
 		gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), menu);
 
@@ -51,14 +53,16 @@ GtkWidget* create_preview_pane(void)
 
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), unfocussable(gtk_separator_menu_item_new()));
 
-		GSList* group = NULL;
-		for (i = 0; i < MENU_PREVIEW_ITEMS; i++)
 		{
-			item = unfocussable(gtk_radio_menu_item_new_with_label(group, "Radio"));
-			gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-			group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM (item));
-			if(i == 0)
-				gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), TRUE);
+			GSList* group = NULL;
+			for (i = 0; i < MENU_PREVIEW_ITEMS; i++)
+			{
+				item = unfocussable(gtk_radio_menu_item_new_with_label(group, "Radio"));
+				gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+				group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM (item));
+				if(i == 0)
+					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), TRUE);
+			}
 		}
 
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), unfocussable(gtk_separator_menu_item_new()));
@@ -77,27 +81,26 @@ GtkWidget* create_preview_pane(void)
 	{
 		GtkToolbar* toolbar = GTK_TOOLBAR(unfocussable(gtk_toolbar_new()));
 		GtkWidget* button;
+		GtkRadioButton* radio;
 
 		button = unfocussable(gtk_check_button_new_with_label("Check 1"));
-		gtk_toolbar_append_widget(toolbar, button, "Tooltip", "");
+		gtk_container_add(GTK_CONTAINER(toolbar), button);
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
 
 		button = unfocussable(gtk_check_button_new_with_label("Check 2"));
-		gtk_toolbar_append_widget(toolbar, button, "Tooltip", "");
+		gtk_container_add(GTK_CONTAINER(toolbar), button);
 
-		gtk_toolbar_append_space(toolbar);
+		/* gtk_toolbar_append_space(toolbar); */
 
-		GtkRadioButton* radio;
-		
 		radio = GTK_RADIO_BUTTON(unfocussable(gtk_radio_button_new_with_label(NULL, "Radio 1")));
-		gtk_toolbar_append_widget(toolbar, GTK_WIDGET(radio), "Tooltip", "");
+		gtk_container_add(GTK_CONTAINER(toolbar), GTK_WIDGET(radio));
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio), TRUE);
 
 		radio = GTK_RADIO_BUTTON(unfocussable(gtk_radio_button_new_with_label_from_widget(radio, "Radio 2")));
-		gtk_toolbar_append_widget(toolbar, GTK_WIDGET(radio), "Tooltip", "");
+		gtk_container_add(GTK_CONTAINER(toolbar), GTK_WIDGET(radio));
 
 		radio = GTK_RADIO_BUTTON(unfocussable(gtk_radio_button_new_with_label_from_widget(radio, "Radio 3")));
-		gtk_toolbar_append_widget(toolbar, GTK_WIDGET(radio), "Tooltip", "");
+		gtk_container_add(GTK_CONTAINER(toolbar), GTK_WIDGET(radio));
 
 		gtk_box_pack_start(box, GTK_WIDGET(toolbar), FALSE, FALSE, 0);
 	}
@@ -143,7 +146,7 @@ GtkWidget* create_preview_pane(void)
 		gtk_box_pack_start(box, GTK_WIDGET(hbox), FALSE, FALSE, 0);
 	}
 
-	GtkWidget* frame = unfocussable(gtk_frame_new("Preview"));
+	frame = unfocussable(gtk_frame_new("Preview"));
 	gtk_container_add(GTK_CONTAINER(frame), GTK_WIDGET(box));
 
 	return frame;
