@@ -21,14 +21,10 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <fcntl.h>
 /*
  * fopen() fdopen() fprintf() -> stdio.h
- * getuid() unlink() -> unistd.h
- * struct passwd -> sys/types.h
- * getpwuid() -> pwd.h
+ * unlink() -> unistd.h
  */
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <pwd.h>
 
 #include "main.h"
 #include "stock.h"
@@ -37,14 +33,7 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 GHashTable *hash = NULL;
 GSList *awaiting_activation = NULL;
 gchar *tmp_rc = NULL, *gtkrc = NULL, *font = NULL, *themename = NULL;
-
-char * homedir()
-{
-	static char* homedir = NULL;
-	if(!homedir)
-		homedir = strdup(getpwuid(getuid())->pw_dir);
-	return homedir;
-}
+gboolean program_init_done = FALSE;
 
 /* dirname gets freed! */
 void read_theme_list(gchar * dirname)
@@ -102,6 +91,7 @@ void apply_new_look(gboolean is_preview)
 		? fdopen(g_file_open_tmp("gtkrc.preview-XXXXXXXX", &tmp_rc, NULL), "w+")
 		: fopen(gtkrc, "w");
 
+	/* FIXME use g_fprintf() (since glib 2.2) instead, gets rid of an #include too */
 	fprintf(gtkrc_fh,
 		"# -- THEME AUTO-WRITTEN DO NOT EDIT\n"
 		"include \"%s\"\n\n",
@@ -124,7 +114,7 @@ void apply_new_look(gboolean is_preview)
 		"include \"%s/.gtkrc.mine\"\n"
 		"\n"
 		"# -- THEME AUTO-WRITTEN DO NOT EDIT\n",
-		homedir());
+		g_get_home_dir());
 
 	fclose(gtkrc_fh);
 
@@ -134,10 +124,10 @@ void apply_new_look(gboolean is_preview)
 		gtk_rc_set_default_files(default_files);
 	}
 
+	if (!program_init_done)
+		return;
 	if (is_preview)
-	{
 		gtk_rc_reparse_all_for_settings(gtk_settings_get_default(), TRUE);
-	}
 	else
 	{
 		GdkEvent event;
@@ -190,16 +180,17 @@ gchar* get_theme(void)
 	return themename;
 }
 
-void rc_skip_section(GScanner *s, GTokenType close)
+void rc_skip_section(GScanner *s, GTokenType closing)
 {
 	while(!g_scanner_eof(s)) {
 		g_scanner_get_next_token(s);
+		if(s->token == closing) return;
 		switch(s->token)
 		{
 			case G_TOKEN_LEFT_PAREN: rc_skip_section(s, G_TOKEN_RIGHT_PAREN); break;
 			case G_TOKEN_LEFT_CURLY: rc_skip_section(s, G_TOKEN_RIGHT_CURLY); break;
 			case G_TOKEN_LEFT_BRACE: rc_skip_section(s, G_TOKEN_RIGHT_BRACE); break;
-			default: if(s->token == close) return;
+			default: ;
 		}
 	}
 }
@@ -253,19 +244,20 @@ void parse_gtkrc(void)
 
 int main(int argc, char *argv[])
 {
-	hash = g_hash_table_new(g_str_hash, g_str_equal);
-	gtkrc = g_strdup_printf("%s/.gtkrc-2.0", homedir());
-
 	gtk_init(&argc, &argv);
 
-	init_new_stock_items();
-
-	read_theme_list(g_strconcat(homedir(), "/.themes", NULL));
+	hash = g_hash_table_new(g_str_hash, g_str_equal);
+	read_theme_list(g_strconcat(g_get_home_dir(), "/.themes", NULL));
 	read_theme_list(gtk_rc_get_theme_dir());
 
+	/* FIXME this is dumb, check gtk_rc_get_default_files() instead */
+	gtkrc = g_strdup_printf("%s/.gtkrc-2.0", g_get_home_dir());
 	parse_gtkrc();
 
+	init_new_stock_items();
 	gtk_widget_show_all(create_mainwin());
+
+	program_init_done = TRUE;
 
 	gtk_main();
 
