@@ -212,11 +212,17 @@ void set_theme_if_match(gpointer key, gpointer value, gpointer path)
 
 void parse_gtkrc(void)
 {
-	GScanner *s = gtk_rc_scanner_new();
-	g_scanner_input_file(s, open(gtkrc, O_RDONLY));
+	GScanner *s;
+	int fh = open(gtkrc, O_RDONLY);
 
-	g_strconcat(homedir(), "/.themes", NULL);
-	g_strconcat(gtk_rc_get_theme_dir(), "%s/gtk-2.0/gtkrc", NULL);
+	if(fh == -1)
+	{
+		set_theme("Default", TRUE);
+		return;
+	}
+
+	s = gtk_rc_scanner_new();
+	g_scanner_input_file(s, fh);
 
 	while(!g_scanner_eof(s)) {
 		g_scanner_get_next_token(s);
