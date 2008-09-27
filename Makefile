@@ -47,13 +47,19 @@ distclean: clean
 realclean: distclean
 	-rm -f *.png_c *.1 Makefile.depend
 
-.PHONY: install
-install: all
-	strip      $(EXENAME)
+.PHONY: strip
+strip: all
+	strip $(EXENAME)
+
+.PHONY: install-files
+install-files: all
 	install -d              $(DESTDIR)/$(BINDIR)
 	install -c $(EXENAME)   $(DESTDIR)/$(BINDIR)
 	install -d              $(DESTDIR)/$(MANDIR)/man1
 	install -c $(EXENAME).1 $(DESTDIR)/$(MANDIR)/man1
+
+.PHONY: install
+install: strip install-files
 
 DISTFILES = $(SRC:.c=.h) $(SRC) $(EXTRAS)
 DISTNAME = $(EXENAME)-$(VERSION)

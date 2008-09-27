@@ -5,6 +5,7 @@
 * Use gtk+-2.6 builtin gtk-about stock item if available
 * Improve dialog creation, responds to [[Esc]]
 * Minor improvements
+* Split install Makefile target into strip + install-files targets so Gentoo ebuild needn't sed the Makefile
 
 # Version 0.3.1
 
