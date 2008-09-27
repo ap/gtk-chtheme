@@ -2,6 +2,7 @@
 
 * Fix missing check if opening .gtkrc-2.0 succeeded before attempting to parse it.
 * Replace use of makedepend by cc -M, miscellaneous Makefile improvements
+* Use gtk+-2.6 builtin gtk-about stock item if available
 
 # Version 0.3.1
 

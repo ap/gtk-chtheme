@@ -12,10 +12,13 @@ CXXFLAGS =
 SRC = util.c stock.c theme_sel.c font_sel.c preview_pane.c about_dialog.c mainwin.c main.c
 
 EXTRAS = $(addprefix $(EXENAME), .spec .spec.in .pod .pod.in .1) \
-		 stock_menu_about.xpm Makefile Metadata replace COPYING ChangeLog
+		 stock_menu_about.png Makefile Metadata replace COPYING ChangeLog
 
 .PHONY: all
 all: $(EXENAME) $(EXENAME).1
+
+%.png_c: %.png
+	gdk-pixbuf-csource --raw --name=$* $< > $@
 
 $(EXENAME): $(SRC:.c=.o)
 	$(CC) $(LDFLAGS) $^ -o $@
@@ -42,7 +45,7 @@ distclean: clean
 
 .PHONY: realclean
 realclean: distclean
-	-rm -f *.1 Makefile.depend
+	-rm -f *.png_c *.1 Makefile.depend
 
 .PHONY: install
 install: all
