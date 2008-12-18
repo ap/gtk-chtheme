@@ -33,7 +33,7 @@ static void font_browse_clicked(GtkWidget *widget, gpointer u)
 	GtkFontSelectionDialog *font_dlg =
 		GTK_FONT_SELECTION_DIALOG(gtk_font_selection_dialog_new("Select Font"));
 
-	gtk_font_selection_dialog_set_preview_text(font_dlg, PROJNAME);
+	gtk_font_selection_dialog_set_preview_text(font_dlg, "Sphinx of Black Quartz, Judge My Vow");
 
 	curfont = gtk_entry_get_text(GTK_ENTRY(font_entry));
 
