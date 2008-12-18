@@ -82,6 +82,7 @@ void cleanup_temporary(void)
 void apply_new_look(gboolean is_preview)
 {
 	FILE *gtkrc_fh;
+	const gchar *home_dir = g_get_home_dir();
 
 	if(!themename) return;
 
@@ -112,9 +113,10 @@ void apply_new_look(gboolean is_preview)
 
 	fprintf(gtkrc_fh,
 		"include \"%s/.gtkrc.mine\"\n"
+		"gtk-theme-name = \"%s\"\n"
 		"\n"
 		"# -- THEME AUTO-WRITTEN DO NOT EDIT\n",
-		g_get_home_dir());
+		home_dir, home_dir);
 
 	fclose(gtkrc_fh);
 
