@@ -3,8 +3,8 @@ include Metadata
 CFLAGS := $(if $(RPM_OPT_FLAGS), $(RPM_OPT_FLAGS), $(CFLAGS))
 
 LDFLAGS += $(shell pkg-config --libs gtk+-2.0)
-CFLAGS += -Wimplicit -Wall -std=gnu89 -pedantic-errors
-CFLAGS += $(shell pkg-config --cflags gtk+-2.0) -DGTK_DISABLE_BROKEN -DGTK_DISABLE_DEPRECATED
+CFLAGS += -Wimplicit -Wall -std=gnu89
+CFLAGS += $(shell pkg-config --cflags gtk+-2.0) -DGTK_DISABLE_BROKEN
 CFLAGS += -DPROJNAME='"$(PROJNAME)"' -DVERSION='"$(VERSION)"'
 CPPFLAGS =
 CXXFLAGS =
