@@ -94,9 +94,7 @@ void apply_new_look(gboolean is_preview)
 
 	/* FIXME use g_fprintf() (since glib 2.2) instead, gets rid of an #include too */
 	fprintf(gtkrc_fh,
-		"# -- THEME AUTO-WRITTEN DO NOT EDIT\n"
-		"include \"%s\"\n\n",
-		(char*) g_hash_table_lookup(hash, themename));
+		"# -- THEME AUTO-WRITTEN DO NOT EDIT\n\n");
 
 	if (font)
 		fprintf(gtkrc_fh,
@@ -106,7 +104,7 @@ void apply_new_look(gboolean is_preview)
 			"\n"
 			"widget_class \"*\" style \"user-font\"\n"
 			"\n"
-			"gtk-font-name=\"%s\"\n"
+			"gtk-font-name = \"%s\"\n"
 			"\n",
 			font,
 			font);
@@ -116,7 +114,7 @@ void apply_new_look(gboolean is_preview)
 		"gtk-theme-name = \"%s\"\n"
 		"\n"
 		"# -- THEME AUTO-WRITTEN DO NOT EDIT\n",
-		home_dir, home_dir);
+		home_dir, themename);
 
 	fclose(gtkrc_fh);
 
